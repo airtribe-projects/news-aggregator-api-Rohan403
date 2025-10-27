@@ -1,7 +1,8 @@
 const User = require("../models/User");
 const getPreferences = async (req, res) => {
   try {
-    const details = await User.findById(req.user).select("preferences");
+    const userId = req.user.id || req.user; // 🩵 supports both formats
+    const details = await User.findById(userId).select("preferences");
     res.status(200).json({ preferences: details.preferences });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -21,4 +22,4 @@ const updatePreferences = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-module.exports = { getPreferences,updatePreferences };
+module.exports = { getPreferences, updatePreferences };

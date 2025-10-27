@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const generateToken = require("../utils/generateTokens");
+const { use } = require("react");
 
 // Register a new user
 
@@ -8,7 +9,7 @@ const registerUser = async (req, res) => {
   try {
     const { name, email, password, preferences } = req.body;
 
-    if (!name || !password) {
+    if (!name || !email || !password) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -25,7 +26,14 @@ const registerUser = async (req, res) => {
       preferences,
     });
 
-    res.status(200).json({ message: "User registered successfully" });
+    res.status(200).json({
+      message: "User registered successfully",
+      user: {
+        name: newUser.name,
+        email: newUser.email,
+        preferences: newUser.preferences,
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -35,7 +43,7 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
-    const {email, password } = req.body;
+    const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "User not found" });
     const isMatch = await bcrypt.compare(password, user.password);
