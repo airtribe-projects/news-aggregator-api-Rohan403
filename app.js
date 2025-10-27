@@ -1,17 +1,24 @@
-const express = require('express');
+const express = require("express");
+const dotenv = require("dotenv");
+const connectDB = require("./config/db");
+const authRoutes = require("./routes/authRoutes");
+const preferenceRouter = require("./routes/preferenceRoute.js");
 const app = express();
-const port = 3000;
+dotenv.config();
+const port = process.env.PORT || 8000;
 
 app.use(express.json());
+//connect to database
+connectDB();
+//routes
+app.use("/users", authRoutes, preferenceRouter);
 app.use(express.urlencoded({ extended: true }));
 
 app.listen(port, (err) => {
-    if (err) {
-        return console.log('Something bad happened', err);
-    }
-    console.log(`Server is listening on ${port}`);
+  if (err) {
+    return console.log("Something bad happened", err);
+  }
+  console.log(`Server is listening on ${port}`);
 });
-
-
 
 module.exports = app;
