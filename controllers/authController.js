@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
+const validator = require("validator");
 const User = require("../models/User");
 const generateToken = require("../utils/generateTokens");
-const { use } = require("react");
 
 // Register a new user
 
@@ -9,10 +9,20 @@ const registerUser = async (req, res) => {
   try {
     const { name, email, password, preferences } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name|| !password) {
       return res.status(400).json({ message: "Missing required fields" });
     }
-
+    // if (!validator.isEmail(email)) {
+    //   return res.status(400).json({ message: "Invalid email format" });
+    // }
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters" });
+    }
+    if (preferences && !Array.isArray(preferences)) {
+      return res.status(400).json({ message: "Preferences must be an array" });
+    }
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
@@ -23,7 +33,7 @@ const registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      preferences,
+      preferences: Array.isArray(preferences) ? preferences : []
     });
 
     res.status(200).json({
@@ -38,6 +48,7 @@ const registerUser = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 // Login user
 

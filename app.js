@@ -6,6 +6,7 @@ const preferenceRouter = require("./routes/preferenceRoute.js");
 const newsRoutes = require("./routes/newsRoutes");
 const app = express();
 dotenv.config();
+require("./cron/cacheUpdater");
 const port = process.env.PORT || 8000;
 
 app.use(express.json());
